@@ -18,6 +18,7 @@ import MdMemory from "@material-design-icons/svg/outlined/memory.svg?component-s
 import MdMic from "@material-design-icons/svg/outlined/mic.svg?component-solid";
 import MdPalette from "@material-design-icons/svg/outlined/palette.svg?component-solid";
 import MdRateReview from "@material-design-icons/svg/outlined/rate_review.svg?component-solid";
+import MdRecordVoiceOver from "@material-design-icons/svg/outlined/record_voice_over.svg?component-solid";
 import MdScience from "@material-design-icons/svg/outlined/science.svg?component-solid";
 import MdSmartToy from "@material-design-icons/svg/outlined/smart_toy.svg?component-solid";
 import MdVerifiedUser from "@material-design-icons/svg/outlined/verified_user.svg?component-solid";
@@ -37,6 +38,7 @@ import { AppearanceMenu } from "./user/appearance";
 import { MyBots, ViewBot } from "./user/bots";
 import { EditProfile } from "./user/profile";
 import { EditSubscription } from "./user/subscriptions";
+import { PushToTalkSettings } from "./user/voice/PushToTalkSettings";
 import { VoiceSettings } from "./user/voice/VoiceSettings";
 
 const Config: SettingsConfiguration<{ server: Server }> = {
@@ -93,6 +95,8 @@ const Config: SettingsConfiguration<{ server: Server }> = {
         return <Native />;
       case "voice":
         return <VoiceSettings />;
+      case "push_to_talk":
+        return <PushToTalkSettings />;
       default:
         return null;
     }
@@ -208,6 +212,11 @@ const Config: SettingsConfiguration<{ server: Server }> = {
               id: "voice",
               icon: <MdMic {...iconSize(20)} />,
               title: <Trans>Voice</Trans>,
+            },
+            {
+              id: "push_to_talk",
+              icon: <MdRecordVoiceOver {...iconSize(20)} />,
+              title: <Trans>Push to Talk</Trans>,
             },
             {
               id: "appearance",

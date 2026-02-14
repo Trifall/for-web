@@ -14,10 +14,15 @@ export interface TypeVoice {
 
   userVolumes: Record<string, number>;
   userMutes: Record<string, boolean>;
+
+  pushToTalkEnabled: boolean;
+  pushToTalkKeybind: string;
+  pushToTalkMode: "hold" | "toggle";
+  pushToTalkReleaseDelay: number;
 }
 
 /**
- * Handles enabling and disabling client experiments.
+ * Voice settings store
  */
 export class Voice extends AbstractStore<"voice", TypeVoice> {
   /**
@@ -46,6 +51,10 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
       outputVolume: 1.0,
       userVolumes: {},
       userMutes: {},
+      pushToTalkEnabled: false,
+      pushToTalkKeybind: "V",
+      pushToTalkMode: "hold",
+      pushToTalkReleaseDelay: 250,
     };
   }
 
@@ -94,6 +103,26 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
           ([userId, muted]) => typeof userId === "string" && muted === true,
         )
         .forEach(([k, v]) => (data.userMutes[k] = v));
+    }
+
+    if (typeof input.pushToTalkEnabled === "boolean") {
+      data.pushToTalkEnabled = input.pushToTalkEnabled;
+    }
+
+    if (typeof input.pushToTalkKeybind === "string") {
+      data.pushToTalkKeybind = input.pushToTalkKeybind;
+    }
+
+    if (input.pushToTalkMode === "hold" || input.pushToTalkMode === "toggle") {
+      data.pushToTalkMode = input.pushToTalkMode;
+    }
+
+    if (
+      typeof input.pushToTalkReleaseDelay === "number" &&
+      input.pushToTalkReleaseDelay >= 0 &&
+      input.pushToTalkReleaseDelay <= 5000
+    ) {
+      data.pushToTalkReleaseDelay = input.pushToTalkReleaseDelay;
     }
 
     return data;
@@ -217,5 +246,85 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
    */
   get outputVolume(): number {
     return this.get().outputVolume;
+  }
+
+  /**
+   * Set push to talk enabled
+   */
+  set pushToTalkEnabled(value: boolean) {
+    this.set("pushToTalkEnabled", value);
+  }
+
+  /**
+   * Get push to talk enabled
+   */
+  get pushToTalkEnabled(): boolean {
+    return this.get().pushToTalkEnabled;
+  }
+
+  /**
+   * Set push to talk keybind
+   */
+  set pushToTalkKeybind(value: string) {
+    this.set("pushToTalkKeybind", value);
+  }
+
+  /**
+   * Get push to talk keybind
+   */
+  get pushToTalkKeybind(): string {
+    return this.get().pushToTalkKeybind;
+  }
+
+  /**
+   * Set push to talk mode
+   */
+  set pushToTalkMode(value: "hold" | "toggle") {
+    this.set("pushToTalkMode", value);
+  }
+
+  /**
+   * Get push to talk mode
+   */
+  get pushToTalkMode(): "hold" | "toggle" {
+    return this.get().pushToTalkMode;
+  }
+
+  /**
+   * Set push to talk release delay
+   */
+  set pushToTalkReleaseDelay(value: number) {
+    this.set("pushToTalkReleaseDelay", value);
+  }
+
+  /**
+   * Get push to talk release delay
+   */
+  get pushToTalkReleaseDelay(): number {
+    return this.get().pushToTalkReleaseDelay;
+  }
+
+  /**
+   * Set all push to talk config at once (from external source like desktop app)
+   */
+  setPushToTalkConfig(config: {
+    enabled?: boolean;
+    keybind?: string;
+    mode?: "hold" | "toggle";
+    releaseDelay?: number;
+  }) {
+    console.log("[Voice] Setting PTT config from external source:", config);
+    if (typeof config.enabled === "boolean") {
+      this.set("pushToTalkEnabled", config.enabled);
+    }
+    if (typeof config.keybind === "string") {
+      this.set("pushToTalkKeybind", config.keybind);
+    }
+    if (config.mode === "hold" || config.mode === "toggle") {
+      this.set("pushToTalkMode", config.mode);
+    }
+    if (typeof config.releaseDelay === "number") {
+      this.set("pushToTalkReleaseDelay", config.releaseDelay);
+    }
   }
 }

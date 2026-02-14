@@ -287,9 +287,31 @@ export function VoiceContext(props: { children: JSX.Element }) {
       window.pushToTalk.onStateChange(handleStateChange);
       console.log("[PTT-WEB] ✓ Listener registered");
 
+      // Sync initial config from desktop to web client (config file is source of truth)
+      console.log("[PTT-WEB] Syncing PTT config from desktop...");
+      const handleConfigChange = (config: {
+        enabled: boolean;
+        keybind: string;
+        mode: "hold" | "toggle";
+        releaseDelay: number;
+      }) => {
+        console.log("[PTT-WEB] Received config from desktop:", config);
+        state.voice.setPushToTalkConfig(config);
+      };
+
+      // Get initial config
+      const initialConfig = window.pushToTalk.getConfig();
+      console.log("[PTT-WEB] Initial config from desktop:", initialConfig);
+      state.voice.setPushToTalkConfig(initialConfig);
+
+      // Listen for future config changes
+      window.pushToTalk.onConfigChange(handleConfigChange);
+      console.log("[PTT-WEB] ✓ Config sync initialized");
+
       onCleanup(() => {
         console.log("[PTT-WEB] Cleaning up PTT listener");
         window.pushToTalk?.offStateChange(handleStateChange);
+        window.pushToTalk?.offConfigChange(handleConfigChange);
       });
     } else {
       console.log("[PTT-WEB] ✗ Desktop PTT API not available (running in browser?)");

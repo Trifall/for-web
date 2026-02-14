@@ -944,6 +944,11 @@ msgstr "Izslēgt dalībnieku klausuli"
 msgid "Default"
 msgstr "Noklusējums"
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.defaultHold"
+msgstr ""
+
 #: components/app/interface/settings/ServerSettings.tsx
 #: components/app/interface/settings/ChannelSettings.tsx
 #: components/app/interface/settings/server/roles/ServerRoleOverview.tsx
@@ -1184,6 +1189,16 @@ msgstr "Iespējot autentifikācijas lietotni"
 #: components/app/interface/settings/user/Notifications.tsx
 msgid "Enable Desktop Notifications"
 msgstr "Iespējot darbvirsmas paziņojumus"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.enable"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.toggleMode"
+msgstr ""
 
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Enable transparency glass/blur effects (slow on older machines)"
@@ -1769,6 +1784,11 @@ msgstr ""
 msgid "Missing permission"
 msgstr ""
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.mode"
+msgstr ""
+
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Monochrome"
 msgstr ""
@@ -2081,6 +2101,21 @@ msgstr ""
 msgid "Provided email or password is wrong."
 msgstr ""
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/UserSettings.tsx
+msgid "ptt.tab.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.keybind"
+msgstr ""
+
 #: components/modal/modals/ReportContent.tsx
 msgid "Raid or spam attack"
 msgstr ""
@@ -2147,6 +2182,11 @@ msgstr ""
 #: components/app/menus/UserContextMenu.tsx
 msgid "Reject friend request"
 msgstr "Noraidīt draudzības pieprasījumu"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.releaseDelay"
+msgstr ""
 
 #: src/interface/channels/text/TextSearchSidebar.tsx
 msgid "Relevance"

@@ -216,7 +216,7 @@ const Config: SettingsConfiguration<{ server: Server }> = {
             {
               id: "push_to_talk",
               icon: <MdRecordVoiceOver {...iconSize(20)} />,
-              title: <Trans>Push to Talk</Trans>,
+              title: <Trans id="ptt.tab.title">Push to Talk</Trans>,
             },
             {
               id: "appearance",

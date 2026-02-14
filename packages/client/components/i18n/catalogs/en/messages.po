@@ -944,6 +944,11 @@ msgstr "Deafen Members"
 msgid "Default"
 msgstr "Default"
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.defaultHold"
+msgstr "Default is Hold mode"
+
 #: components/app/interface/settings/ServerSettings.tsx
 #: components/app/interface/settings/ChannelSettings.tsx
 #: components/app/interface/settings/server/roles/ServerRoleOverview.tsx
@@ -1184,6 +1189,16 @@ msgstr "Enable authenticator app"
 #: components/app/interface/settings/user/Notifications.tsx
 msgid "Enable Desktop Notifications"
 msgstr "Enable Desktop Notifications"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.enable"
+msgstr "Enable Push to Talk"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.toggleMode"
+msgstr "Enable Toggle Mode"
 
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Enable transparency glass/blur effects (slow on older machines)"
@@ -1769,6 +1784,11 @@ msgstr "Minimise to Tray"
 msgid "Missing permission"
 msgstr "Missing permission"
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.mode"
+msgstr "Mode"
+
 #: components/app/interface/settings/user/appearance/AppearanceMenu.tsx
 msgid "Monochrome"
 msgstr "Monochrome"
@@ -2081,6 +2101,21 @@ msgstr "Promotes harm"
 msgid "Provided email or password is wrong."
 msgstr "Provided email or password is wrong."
 
+#. js-lingui-explicit-id
+#: components/app/interface/settings/UserSettings.tsx
+msgid "ptt.tab.title"
+msgstr "Push to Talk"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.title"
+msgstr "Push to Talk"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.keybind"
+msgstr "Push to Talk Keybind"
+
 #: components/modal/modals/ReportContent.tsx
 msgid "Raid or spam attack"
 msgstr "Raid or spam attack"
@@ -2147,6 +2182,11 @@ msgstr "Registered since <0/>"
 #: components/app/menus/UserContextMenu.tsx
 msgid "Reject friend request"
 msgstr "Reject friend request"
+
+#. js-lingui-explicit-id
+#: components/app/interface/settings/user/voice/PushToTalkSettings.tsx
+msgid "ptt.settings.releaseDelay"
+msgstr "Release Delay"
 
 #: src/interface/channels/text/TextSearchSidebar.tsx
 msgid "Relevance"

@@ -40,7 +40,7 @@ export function PushToTalkSettings() {
     <Column gap="lg">
       <Column>
         <Text class="title" size="small">
-          <Trans>Push to Talk</Trans>
+          <Trans id="ptt.settings.title">Push to Talk</Trans>
         </Text>
 
         <CategoryButton.Group>
@@ -59,7 +59,7 @@ export function PushToTalkSettings() {
               syncToDesktop({ enabled: newValue });
             }}
           >
-            <Trans>Enable Push to Talk</Trans>
+            <Trans id="ptt.settings.enable">Enable Push to Talk</Trans>
           </CategoryButton>
         </CategoryButton.Group>
       </Column>
@@ -67,7 +67,7 @@ export function PushToTalkSettings() {
       <Show when={state.voice.pushToTalkEnabled}>
         <Column gap="md">
           <Text class="label">
-            <Trans>Push to Talk Keybind</Trans>
+            <Trans id="ptt.settings.keybind">Push to Talk Keybind</Trans>
           </Text>
           <KeybindInput
             value={state.voice.pushToTalkKeybind}
@@ -81,7 +81,7 @@ export function PushToTalkSettings() {
 
         <Column>
           <Text class="label">
-            <Trans>Mode</Trans>
+            <Trans id="ptt.settings.mode">Mode</Trans>
           </Text>
           <CategoryButton.Group>
             <CategoryButton
@@ -99,17 +99,17 @@ export function PushToTalkSettings() {
                 syncToDesktop({ mode: newMode });
               }}
             >
-              <Trans>Enable Toggle Mode</Trans>
+              <Trans id="ptt.settings.toggleMode">Enable Toggle Mode</Trans>
             </CategoryButton>
           </CategoryButton.Group>
           <Text class="label" size="small">
-            <Trans>Default is Hold mode</Trans>
+            <Trans id="ptt.settings.defaultHold">Default is Hold mode</Trans>
           </Text>
         </Column>
 
         <Column gap="md">
           <Text class="label">
-            <Trans>Release Delay</Trans>
+            <Trans id="ptt.settings.releaseDelay">Release Delay</Trans>
           </Text>
           <Row gap="md" align="center">
             <SliderContainer>

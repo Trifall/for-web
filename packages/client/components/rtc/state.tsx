@@ -118,7 +118,6 @@ class Voice {
       this.#setChannel(channel);
       this.#setState("CONNECTING");
 
-      // Start with mic OFF (muted) for PTT mode
       console.log("[PTT-WEB] Setting initial mic state to OFF (muted)");
       this.#setMicrophone(false);
       this.#setDeafen(false);
@@ -129,8 +128,6 @@ class Voice {
       // Note: PTT starts with mic OFF, user must press key to speak
       if (this.speakingPermission) {
         console.log("[PTT-WEB] User has speaking permission, but keeping mic OFF initially (PTT mode)");
-        // Don't enable mic automatically - wait for PTT key
-        // room.localParticipant.setMicrophoneEnabled(true)...
       }
     });
 
@@ -208,7 +205,6 @@ class Voice {
     const currentState = room.localParticipant.isMicrophoneEnabled;
     console.log("[PTT-WEB] setMute() - current mic state:", currentState, "target:", enabled);
     
-    // Only change if different from current state
     if (currentState !== enabled) {
       console.log("[PTT-WEB] setMute() - calling setMicrophoneEnabled(", enabled, ")");
       await room.localParticipant.setMicrophoneEnabled(enabled);
@@ -261,7 +257,6 @@ export function VoiceContext(props: { children: JSX.Element }) {
   const state = useState();
   const voice = new Voice(state.voice);
 
-  // Initialize push-to-talk integration with desktop app
   onMount(() => {
     console.log("[PTT-WEB] VoiceContext mounted, checking for desktop PTT API...");
     console.log("[PTT-WEB] window.pushToTalk exists:", typeof window !== "undefined" && !!window.pushToTalk);
@@ -280,7 +275,6 @@ export function VoiceContext(props: { children: JSX.Element }) {
         // e.active = true means PTT key is pressed (mic should be ON/unmuted)
         // e.active = false means PTT key is released (mic should be OFF/muted)
         if (voice.room()) {
-          // setMute(true) = enable mic (unmute), setMute(false) = disable mic (mute)
           const shouldEnableMic = e.active;
           console.log("[PTT-WEB] PTT active:", e.active, "-> Mic enabled:", shouldEnableMic);
           voice.setMute(shouldEnableMic);
@@ -290,7 +284,6 @@ export function VoiceContext(props: { children: JSX.Element }) {
       };
       
       // Also apply current state immediately when joining a call
-      // This ensures PTT OFF is applied when first connecting
       const applyCurrentPttState = () => {
         const room = voice.room();
         if (room) {
@@ -302,10 +295,7 @@ export function VoiceContext(props: { children: JSX.Element }) {
         }
       };
       
-      // Apply state now and also listen for room connection
       applyCurrentPttState();
-
-      // Apply current state immediately
       handleStateChange(currentState);
 
       console.log("[PTT-WEB] Registering onStateChange listener...");

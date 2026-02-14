@@ -1,7 +1,3 @@
-// TOP OF FILE - BEFORE ANY IMPORTS
-console.log("RTC STATE MODULE LOADING NOW");
-alert("RTC STATE MODULE LOADING");
-
 import {
   Accessor,
   JSX,
@@ -31,9 +27,6 @@ declare global {
 
 import { Room } from "livekit-client";
 import { Channel } from "stoat.js";
-
-// DEBUG: Verify this file is being loaded
-console.log("[PTT-WEB] state.tsx module loaded!"); alert("[PTT-WEB] VOICE MODULE LOADED - CHECK CONSOLE");
 
 import { useState } from "@revolt/state";
 import { Voice as VoiceSettings } from "@revolt/state/stores/Voice";

@@ -27,7 +27,6 @@ import { I18nProvider } from "@revolt/i18n";
 import { KeybindContext } from "@revolt/keybinds";
 import { ModalContext, ModalRenderer, useModals } from "@revolt/modal";
 import { VoiceContext } from "@revolt/rtc";
-console.log("[INDEX] VoiceContext imported:", VoiceContext);
 import { StateContext, SyncWorker, useState } from "@revolt/state";
 import { FloatingManager, LoadTheme } from "@revolt/ui";
 

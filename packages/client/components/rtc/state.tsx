@@ -4,12 +4,15 @@ import {
   Setter,
   batch,
   createContext,
+  createEffect,
   createSignal,
   useContext,
   onMount,
   onCleanup,
 } from "solid-js";
 import { RoomContext } from "solid-livekit-components";
+
+import { voiceNotifications } from "./VoiceNotifications";
 
 // Type declarations for Stoat Desktop push-to-talk API
 declare global {
@@ -28,6 +31,7 @@ import { Channel } from "stoat.js";
 
 import { useState } from "@revolt/state";
 import { Voice as VoiceSettings } from "@revolt/state/stores/Voice";
+import { useClient } from "@revolt/client";
 import { VoiceCallCardContext } from "@revolt/ui/components/features/voice/callCard/VoiceCallCard";
 
 import { InRoom } from "./components/InRoom";
@@ -132,6 +136,8 @@ class Voice {
     room.addListener("connected", () => {
       console.log("[PTT-WEB] Room connected");
       this.#setState("CONNECTED");
+      console.log("[VoiceNotifications] Playing self join sound");
+      voiceNotifications.playSelfJoin();
     });
 
     room.addListener("disconnected", () => {
@@ -254,6 +260,7 @@ const voiceContext = createContext<Voice>(null as unknown as Voice);
 export function VoiceContext(props: { children: JSX.Element }) {
   const state = useState();
   const voice = new Voice(state.voice);
+  const client = useClient();
 
   onMount(() => {
     console.log("[PTT-WEB] VoiceContext mounted, checking for desktop PTT API...");
@@ -299,12 +306,12 @@ export function VoiceContext(props: { children: JSX.Element }) {
         state.voice.setPushToTalkConfig(config);
       };
 
-      // Get initial config
+      // get initial config
       const initialConfig = window.pushToTalk.getConfig();
       console.log("[PTT-WEB] Initial config from desktop:", initialConfig);
       state.voice.setPushToTalkConfig(initialConfig);
 
-      // Listen for future config changes
+      // listen for future config changes
       window.pushToTalk.onConfigChange(handleConfigChange);
       console.log("[PTT-WEB] ✓ Config sync initialized");
 
@@ -316,6 +323,63 @@ export function VoiceContext(props: { children: JSX.Element }) {
     } else {
       console.log("[PTT-WEB] ✗ Desktop PTT API not available (running in browser?)");
     }
+
+    // setup voice notification sounds
+    const currentClient = client();
+    console.log("[VoiceNotifications] Setting up notifications, client available:", !!currentClient);
+    
+    if (!currentClient) {
+      console.log("[VoiceNotifications] Client not available yet, skipping setup");
+    } else {
+      // console.log("[VoiceNotifications] Registering event listeners");
+      
+      const onJoin = (channel: Channel, participant: { userId: string }) => {
+        // console.log("[VoiceNotifications] VoiceChannelJoin event received:", {
+        //   channelId: channel.id,
+        //   participantId: participant.userId,
+        //   currentChannelId: voice.channel()?.id,
+        //   currentUserId: currentClient.user?.id,
+        //   shouldPlay: voice.channel()?.id === channel.id && participant.userId !== currentClient.user?.id
+        // });
+        if (voice.channel()?.id === channel.id && participant.userId !== currentClient.user?.id) {
+          console.log("[VoiceNotifications] Playing join sound");
+          voiceNotifications.playJoin();
+        }
+      };
+
+      const onLeave = (channel: Channel, userId: string) => {
+        // console.log("[VoiceNotifications] VoiceChannelLeave event received:", {
+        //   channelId: channel.id,
+        //   userId: userId,
+        //   currentChannelId: voice.channel()?.id,
+        //   currentUserId: currentClient.user?.id,
+        //   shouldPlay: voice.channel()?.id === channel.id && userId !== currentClient.user?.id
+        // });
+        if (voice.channel()?.id === channel.id && userId !== currentClient.user?.id) {
+          console.log("[VoiceNotifications] Playing leave sound");
+          voiceNotifications.playLeave();
+        }
+      };
+
+      currentClient.on("voiceChannelJoin", onJoin);
+      currentClient.on("voiceChannelLeave", onLeave);
+      console.log("[VoiceNotifications] Event listeners registered");
+
+      onCleanup(() => {
+        console.log("[VoiceNotifications] Cleaning up event listeners");
+        currentClient.off("voiceChannelJoin", onJoin);
+        currentClient.off("voiceChannelLeave", onLeave);
+      });
+    }
+  });
+
+  // Sync notification settings reactively
+  createEffect(() => {
+    const enabled = state.voice.get().notificationSoundsEnabled;
+    const volume = state.voice.get().notificationVolume;
+    console.log("[VoiceNotifications] Settings updated - enabled:", enabled, "volume:", volume);
+    voiceNotifications.setEnabled(enabled);
+    voiceNotifications.setVolume(volume);
   });
 
   return (

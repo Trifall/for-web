@@ -19,6 +19,9 @@ export interface TypeVoice {
   pushToTalkKeybind: string;
   pushToTalkMode: "hold" | "toggle";
   pushToTalkReleaseDelay: number;
+
+  notificationSoundsEnabled: boolean;
+  notificationVolume: number;
 }
 
 /**
@@ -55,6 +58,8 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
       pushToTalkKeybind: "V",
       pushToTalkMode: "hold",
       pushToTalkReleaseDelay: 250,
+      notificationSoundsEnabled: true,
+      notificationVolume: 0.75,
     };
   }
 
@@ -123,6 +128,14 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
       input.pushToTalkReleaseDelay <= 5000
     ) {
       data.pushToTalkReleaseDelay = input.pushToTalkReleaseDelay;
+    }
+
+    if (typeof input.notificationSoundsEnabled === "boolean") {
+      data.notificationSoundsEnabled = input.notificationSoundsEnabled;
+    }
+
+    if (typeof input.notificationVolume === "number") {
+      data.notificationVolume = Math.max(0, Math.min(1, input.notificationVolume));
     }
 
     return data;

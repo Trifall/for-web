@@ -24,10 +24,11 @@ const SOUND_FILES: Record<SoundName, string> = {
 
 class VoiceNotificationManager {
   private enabled = true;
-  private volume = 0.5;
+  private volume = 0.25; 
   private audioBuffers = new Map<SoundName, AudioBuffer>();
   private audioContext: AudioContext | null = null;
   private hasUserInteracted = false;
+  private currentlyPlaying = new Set<SoundName>(); 
 
   constructor() {
     this.handleUserInteraction = this.handleUserInteraction.bind(this);
@@ -110,6 +111,9 @@ class VoiceNotificationManager {
 
   private async playSound(name: SoundName): Promise<void> {
     if (!this.isSoundEnabled(name)) return;
+    
+    // prevent overlapping sounds
+    if (this.currentlyPlaying.has(name)) return;
 
     const ctx = this.getAudioContext();
     if (!ctx) return;
@@ -132,6 +136,9 @@ class VoiceNotificationManager {
       }
     }
 
+    // mark as playing
+    this.currentlyPlaying.add(name);
+
     const source = ctx.createBufferSource();
     const gainNode = ctx.createGain();
     source.buffer = buffer;
@@ -143,6 +150,7 @@ class VoiceNotificationManager {
     source.onended = () => {
       source.disconnect();
       gainNode.disconnect();
+      this.currentlyPlaying.delete(name);
     };
   }
 

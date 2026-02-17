@@ -70,7 +70,7 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
       pushToTalkReleaseDelay: 250,
       pushToTalkNotificationSounds: false,
       notificationSoundsEnabled: true,
-      notificationVolume: 0.75,
+      notificationVolume: 0.3,
       soundJoinCall: true,
       soundLeaveCall: true,
       soundSomeoneJoined: true,
@@ -389,7 +389,9 @@ export class Voice extends AbstractStore<"voice", TypeVoice> {
     releaseDelay?: number;
     notificationSounds?: boolean;
   }) {
-    console.log("[Voice] Setting PTT config from external source:", config);
+    if (import.meta.env.DEV) {
+      console.log("[Voice] Setting PTT config from external source:", config);
+    }
     if (typeof config.enabled === "boolean") {
       this.set("pushToTalkEnabled", config.enabled);
     }

@@ -14,6 +14,12 @@ import { RoomContext } from "solid-livekit-components";
 
 import { voiceNotifications } from "./VoiceNotifications";
 
+const debugLog = (prefix: string, ...args: unknown[]) => {
+  if (import.meta.env.DEV) {
+    console.log(`[${prefix}]`, ...args);
+  }
+};
+
 // Type declarations for Stoat Desktop push-to-talk API
 declare global {
   interface Window {
@@ -126,7 +132,7 @@ class Voice {
   }
 
   async connect(channel: Channel, auth?: { url: string; token: string }) {
-    console.log("[PTT-WEB] Voice.connect() called for channel:", channel.id);
+    debugLog("PTT-WEB", "Voice.connect() called for channel:", channel.id);
     this.disconnect();
 
     const room = new Room({
@@ -148,10 +154,10 @@ class Voice {
       // only auto-mute when PTT is enabled
       const pttEnabled = this.#settings.pushToTalkEnabled;
       if (pttEnabled) {
-        console.log("[PTT-WEB] PTT enabled - Setting initial mic state to OFF (muted)");
+        debugLog("PTT-WEB", "PTT enabled - Setting initial mic state to OFF (muted)");
         this.#setMicrophone(false);
       } else {
-        console.log("[PTT-WEB] PTT disabled - Keeping mic state as-is");
+        debugLog("PTT-WEB", "PTT disabled - Keeping mic state as-is");
         this.#setMicrophone(true);
       }
       this.#setDeafen(false);
@@ -160,14 +166,14 @@ class Voice {
     });
 
     room.addListener("connected", () => {
-      console.log("[PTT-WEB] Room connected");
+      debugLog("PTT-WEB", "Room connected");
       this.#setState("CONNECTED");
       console.log("[VoiceNotifications] Playing self join sound");
       voiceNotifications.playSelfJoin();
     });
 
     room.addListener("disconnected", () => {
-      console.log("[PTT-WEB] Room disconnected");
+      debugLog("PTT-WEB", "Room disconnected");
       this.#setState("DISCONNECTED");
     });
 
@@ -175,17 +181,27 @@ class Voice {
       auth = await channel.joinCall("worldwide");
     }
 
-    console.log("[PTT-WEB] Connecting to room...");
+    debugLog("PTT-WEB", "Connecting to room...");
     await room.connect(auth.url, auth.token, {
       autoSubscribe: false,
     });
-    console.log("[PTT-WEB] Room connected successfully, mic state:", room.localParticipant.isMicrophoneEnabled);
+    debugLog("PTT-WEB", "Room connected successfully, mic state:", room.localParticipant.isMicrophoneEnabled);
     
-    // only auto-mute when PTT is enabled
-    if (this.#settings.pushToTalkEnabled && room.localParticipant.isMicrophoneEnabled) {
-      console.log("[PTT-WEB] PTT enabled and mic was auto-enabled by LiveKit, explicitly muting...");
-      await room.localParticipant.setMicrophoneEnabled(false);
-      console.log("[PTT-WEB] Mic explicitly muted, state:", room.localParticipant.isMicrophoneEnabled);
+    // Handle mic state based on PTT setting
+    if (this.#settings.pushToTalkEnabled) {
+      // PTT enabled - mute mic so user must press key to speak
+      if (room.localParticipant.isMicrophoneEnabled) {
+        debugLog("PTT-WEB", "PTT enabled and mic was auto-enabled by LiveKit, explicitly muting...");
+        await room.localParticipant.setMicrophoneEnabled(false);
+        debugLog("PTT-WEB", "Mic explicitly muted, state:", room.localParticipant.isMicrophoneEnabled);
+      }
+    } else {
+      // PTT disabled - unmute mic so user can speak immediately
+      if (!room.localParticipant.isMicrophoneEnabled) {
+        debugLog("PTT-WEB", "PTT disabled and mic is muted, explicitly unmuting...");
+        await room.localParticipant.setMicrophoneEnabled(true);
+        debugLog("PTT-WEB", "Mic explicitly unmuted, state:", room.localParticipant.isMicrophoneEnabled);
+      }
     }
   }
 
@@ -235,21 +251,21 @@ class Voice {
    * @param enabled true to unmute, false to mute
    */
   async setMute(enabled: boolean) {
-    console.log("[PTT-WEB] setMute() called:", enabled);
+    debugLog("PTT-WEB", "setMute() called:", enabled);
     const room = this.room();
     if (!room) {
-      console.log("[PTT-WEB] setMute() - no room, returning");
+      debugLog("PTT-WEB", "setMute() - no room, returning");
       return;
     }
     
     const currentState = room.localParticipant.isMicrophoneEnabled;
-    console.log("[PTT-WEB] setMute() - current mic state:", currentState, "target:", enabled);
+    debugLog("PTT-WEB", "setMute() - current mic state:", currentState, "target:", enabled);
     
     if (currentState !== enabled) {
-      console.log("[PTT-WEB] setMute() - calling setMicrophoneEnabled(", enabled, ")");
+      debugLog("PTT-WEB", "setMute() - calling setMicrophoneEnabled(", enabled, ")");
       await room.localParticipant.setMicrophoneEnabled(enabled);
       this.#setMicrophone(enabled);
-      console.log("[PTT-WEB] setMute() - mic state updated to:", enabled);
+      debugLog("PTT-WEB", "setMute() - mic state updated to:", enabled);
       
       // only play sounds if PTT is disabled, or if PTT is enabled with notification sounds on
       const shouldPlaySound = !this.#settings.pushToTalkEnabled || this.#settings.pushToTalkNotificationSounds;
@@ -262,7 +278,7 @@ class Voice {
         }
       }
     } else {
-      console.log("[PTT-WEB] setMute() - no change needed, already:", enabled);
+      debugLog("PTT-WEB", "setMute() - no change needed, already:", enabled);
     }
   }
 
@@ -310,65 +326,65 @@ export function VoiceContext(props: { children: JSX.Element }) {
   const client = useClient();
 
   onMount(() => {
-    console.log("[PTT-WEB] VoiceContext mounted, checking for desktop PTT API...");
-    console.log("[PTT-WEB] window.pushToTalk exists:", typeof window !== "undefined" && !!window.pushToTalk);
+    debugLog("PTT-WEB", "VoiceContext mounted, checking for desktop PTT API...");
+    debugLog("PTT-WEB", "window.pushToTalk exists:", typeof window !== "undefined" && !!window.pushToTalk);
     
     if (typeof window !== "undefined" && window.pushToTalk) {
-      console.log("[PTT-WEB] ✓ Desktop PTT API found, initializing integration");
+      debugLog("PTT-WEB", "✓ Desktop PTT API found, initializing integration");
 
       // Check current state immediately (in case we missed the initial signal)
       const currentState = window.pushToTalk.getCurrentState();
-      console.log("[PTT-WEB] Current PTT state from desktop:", currentState.active ? "ON" : "OFF");
+      debugLog("PTT-WEB", "Current PTT state from desktop:", currentState.active ? "ON" : "OFF");
 
       const handleStateChange = (e: { active: boolean }) => {
-        console.log("[PTT-WEB] Received state change from desktop:", e.active ? "ON" : "OFF");
-        console.log("[PTT-WEB] Current room:", voice.room() ? "connected" : "not connected");
+        debugLog("PTT-WEB", "Received state change from desktop:", e.active ? "ON" : "OFF");
+        debugLog("PTT-WEB", "Current room:", voice.room() ? "connected" : "not connected");
         
         // e.active = true means PTT key is pressed (mic should be ON/unmuted)
         // e.active = false means PTT key is released (mic should be OFF/muted)
         if (voice.room()) {
           const shouldEnableMic = e.active;
-          console.log("[PTT-WEB] PTT active:", e.active, "-> Mic enabled:", shouldEnableMic);
+          debugLog("PTT-WEB", "PTT active:", e.active, "-> Mic enabled:", shouldEnableMic);
           voice.setMute(shouldEnableMic);
         } else {
-          console.log("[PTT-WEB] ⚠ No active room, cannot mute/unmute");
+          debugLog("PTT-WEB", "⚠ No active room, cannot mute/unmute");
         }
       };
       
       handleStateChange(currentState);
 
-      console.log("[PTT-WEB] Registering onStateChange listener...");
+      debugLog("PTT-WEB", "Registering onStateChange listener...");
       window.pushToTalk.onStateChange(handleStateChange);
-      console.log("[PTT-WEB] ✓ Listener registered");
+      debugLog("PTT-WEB", "✓ Listener registered");
 
       // Sync initial config from desktop to web client (config file is source of truth)
-      console.log("[PTT-WEB] Syncing PTT config from desktop...");
+      debugLog("PTT-WEB", "Syncing PTT config from desktop...");
       const handleConfigChange = (config: {
         enabled: boolean;
         keybind: string;
         mode: "hold" | "toggle";
         releaseDelay: number;
       }) => {
-        console.log("[PTT-WEB] Received config from desktop:", config);
+        debugLog("PTT-WEB", "Received config from desktop:", config);
         state.voice.setPushToTalkConfig(config);
       };
 
       // get initial config
       const initialConfig = window.pushToTalk.getConfig();
-      console.log("[PTT-WEB] Initial config from desktop:", initialConfig);
+      debugLog("PTT-WEB", "Initial config from desktop:", initialConfig);
       state.voice.setPushToTalkConfig(initialConfig);
 
       // listen for future config changes
       window.pushToTalk.onConfigChange(handleConfigChange);
-      console.log("[PTT-WEB] ✓ Config sync initialized");
+      debugLog("PTT-WEB", "✓ Config sync initialized");
 
       onCleanup(() => {
-        console.log("[PTT-WEB] Cleaning up PTT listener");
+        debugLog("PTT-WEB", "Cleaning up PTT listener");
         window.pushToTalk?.offStateChange(handleStateChange);
         window.pushToTalk?.offConfigChange(handleConfigChange);
       });
     } else {
-      console.log("[PTT-WEB] ✗ Desktop PTT API not available (running in browser?)");
+      debugLog("PTT-WEB", "✗ Desktop PTT API not available (running in browser?)");
     }
 
     // setup voice notification sounds

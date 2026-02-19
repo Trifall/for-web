@@ -1,4 +1,4 @@
-import { Show, type JSX, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, type JSX, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 
 import { styled } from "styled-system/jsx";
 
@@ -69,6 +69,13 @@ export function KeybindInput(props: Props) {
 
   onMount(() => {
     setDisplayValue(props.value);
+  });
+
+  // update displayValue when props.value changes externally
+  createEffect(() => {
+    if (!capturing()) {
+      setDisplayValue(props.value);
+    }
   });
 
   const startCapturing = () => {

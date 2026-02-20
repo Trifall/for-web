@@ -203,6 +203,21 @@ const Config: SettingsConfiguration<{ server: Server }> = {
           ],
         },
         {
+          title: "Stoat Plus Settings",
+          entries: [
+            {
+              id: "push_to_talk",
+              icon: <MdRecordVoiceOver {...iconSize(20)} />,
+              title: <Trans id="ptt.tab.title">Push to Talk</Trans>,
+            },
+            {
+              id: "notification_sounds",
+              icon: <MdNotifications {...iconSize(20)} />,
+              title: <Trans id="notifications.tab.title">Notification Sounds</Trans>,
+            },
+          ],
+        },
+        {
           title: <Trans>Client Settings</Trans>,
           entries: [
             // {
@@ -216,16 +231,6 @@ const Config: SettingsConfiguration<{ server: Server }> = {
               id: "voice",
               icon: <MdMic {...iconSize(20)} />,
               title: <Trans>Voice</Trans>,
-            },
-            {
-              id: "push_to_talk",
-              icon: <MdRecordVoiceOver {...iconSize(20)} />,
-              title: <Trans id="ptt.tab.title">Push to Talk</Trans>,
-            },
-            {
-              id: "notification_sounds",
-              icon: <MdNotifications {...iconSize(20)} />,
-              title: <Trans id="notifications.tab.title">Notification Sounds</Trans>,
             },
             {
               id: "appearance",
